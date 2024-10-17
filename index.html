@@ -246,15 +246,24 @@
 <body>
     <!-- Initial Screen -->
     <div id="start-screen">
-        <img src="https://logos-world.net/wp-content/uploads/2020/09/Tinder-Logo.png" alt="Logo">
-        <input type="text" id="username" placeholder="Username">
+        <a href="https://tinterno.com/">
+    <img src="https://i.postimg.cc/7Ygmpt7f/tinterno.png" alt="Logo">
+</a>
+        <input type="text" id="username" placeholder="Nome">
         <button id="start-button">Começar</button>
-        <!-- Embedded YouTube Video -->
+      
+        <a href="https://diariodarepublica.pt/dr/detalhe/lei/35-2023-215980339">
+<button id="start-button">Consultar a Nova Lei</button>
+</a>
+      
         <div id="video-container">
             <iframe src="https://www.youtube.com/embed/cUf2mJWYAck?si=OXOpt2ycs6j7Ewlz" title="YouTube video player" allowfullscreen></iframe>
         </div>
-    </div>
 
+    </div>
+  
+
+  
     <!-- Tinder Cards -->
     <div class="tinder">
         <div class="tinder--status">
@@ -271,7 +280,7 @@
         <img src="https://logos-world.net/wp-content/uploads/2020/09/Tinder-Logo.png" alt="Logo">
         <h1 id="score-text"></h1>
         <p id="time-text"></p>
-        <button id="refresh-button">Refresh</button>
+        <button id="refresh-button">Recomeçar</button>
     </div>
 
     <!-- Footer -->
@@ -283,9 +292,17 @@
     <script>
         // Questions Data
         const questions = [
-            { number: 1, image_url: 'https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg', title: 'Miguel Fernandes', text: 'Um familiar de um internado voluntariamente num hospital psiquiátrico quer requerer o internamento compulsivo por acreditar que o internado está a enganar os médicos e a esconder o seu estado mental. O internado é maior de idade e o familiar não tem procuração nem outras responsabilidades legais sobre ele.', answer: 'T' },
-            { number: 2, image_url: 'https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://fdczvxmwwjwpwbeeqcth.supabase.co/storage/v1/object/public/images/50dab922-5d48-4c6b-8725-7fd0755d9334/3a3f2d35-8167-4708-9ef0-bdaa980989f9.png', title: 'Patrícia Pinheiro', text: 'Dois psiquiatras avaliam um homem que afirma ser "a reencarnação de Eusébio" e então anda a dar pontapés em objetos que encontra nas ruas e acreditam que ele deve ser internado. Um dos psiquiatras é fervoroso adepto do Sporting e insiste que o homem está apenas "a expressar a sua frustração" de forma benigna, enquanto o outro, do Benfica, acha que é uma questão de honra protegê-lo.', answer: 'F' },
-            // Add more questions as needed
+            { number: 1, image_url: 'https://i.postimg.cc/cJZHFCWv/image.png', title: 'Marta Feliz', text: 'Mulher de 20 anos é internada compulsivamente devido a um episódio de automutilação grave. Depois de um mês de tratamento, a equipa de saúde decide que já não há risco de autolesão, mas os pais insistem na continuação do internamento.', answer: 'F' },
+            { number: 2, image_url: 'https://i.postimg.cc/J0y4sBN2/image.png', title: 'Ricarda Salgada', text: 'Mulher de 55 anos com diagnóstico de demência recusa-se a sair de casa e tomar medicação, afirmando que está em plena capacidade de gerir a sua vida. No entanto, já não reconhece os filhos e deixou de se alimentar corretamente. Os filhos pedem o internamento.', answer: 'T' },
+          { number: 3, image_url: 'https://i.postimg.cc/7Z1PJ4zw/image.png', title: 'Marco Dias', text: 'Marco Dias, famoso por organizar jantares extravagantes, decide fazer um evento com comida "telepática", convencido de que os convidados podem alimentar-se apenas com o pensamento. Vários convidados começam a desmaiar por falta de comida real.', answer: 'T' },
+          { number: 4, image_url: 'https://i.postimg.cc/g0NY4K47/image.png', title: 'Artur Dias', text: 'Um médico psiquiatra realiza uma avaliação clínico-psiquiátrica em apenas um dia e submete de imediato o relatório ao tribunal para pedir o internamento compulsivo do Sr Artur Dias, um paciente que recusa medicação.', answer: 'F' },
+          { number: 5, image_url: 'https://i.postimg.cc/J0y4sBN2/image.png', title: 'André Carminho', text: 'Um tribunal recebeu um pedido de internamento compulsivo de André Carminho e autorizou-o. Passaram agora 67 dias e ainda não se fez reavaliação psiquiátrica. O paciente diz que quer ir para casa.', answer: 'F' },
+          { number: 6, image_url: 'https://i.postimg.cc/FFfLdfHv/image.png', title: 'Jorge Ribeiro', text: 'No hospital, um médico tenta pedir o internamento compulsivo de Jorge Ribeiro após uma avaliação rápida, mas o fax do hospital avaria. Desesperado, o médico liga para o tribunal para fazer o pedido oralmente pelo telefone, explicando tudo ao juiz numa chamada de 30 minutos.', answer: 'F' },
+          { number: 7, image_url: 'https://i.postimg.cc/RFWNH89d/image.png', title: 'Gonçalo Horta', text: 'Dois psiquiatras avaliam Golçalo Horta, que afirma ser "a reencarnação de Eusébio", e então anda a dar pontapés em objetos que encontra nas ruas e acreditam que ele deve ser internado. Um dos psiquiatras é fervoroso adepto do Sporting e insiste que o homem está apenas "a expressar a sua frustração" de forma benigna, enquanto o outro, do Benfica, acha que não.', answer: 'F' },
+          { number: 8, image_url: 'https://i.postimg.cc/c18v1VF4/image.png', title: 'Marcelo Gato', text: 'Marcelo Gato, paciente internado compulsivamente, nomeou como pessoa de confiança o seu cão, “Bolinhas”, e então argumenta que o Bolinhas nunca foi notificado e que tem de ser libertado', answer: 'T' },
+          { number: 9, image_url: 'https://i.postimg.cc/W30cC67j/image.png', title: 'Vanda Rodrigues', text: 'O juiz emite o mandado de condução para o internamento de Vanda Rodrigues, que diz ser uma ninja, mas ela escapa ao serviço de saúde mental várias vezes, alegando que está “em missão secreta”. A PSP é chamada para intervir, mas a mulher afirma que “não cometeu crime nenhum”.', answer: 'T' },
+          { number: 10, image_url: 'https://i.postimg.cc/7hDrkGBz/image.png', title: 'Tom Cruise', text: 'Um psiquiatra decide internar compulsivamente Tom Cruise, ex-namorado da sua filha, alegando que o homem “está desequilibrado, a deixou emocionalmente abalada e é perigoso”. Mais ninguém presenciou comportamentos perigosos, mas um segundo psiquiatra amigo do primeiro também assina o relatório.', answer: 'F' },
+
         ];
 
         let currentCardIndex = 0;
@@ -309,7 +326,7 @@
         function startQuiz() {
             userName = document.getElementById('username').value.trim();
             if (userName === '') {
-                alert('Please enter your username.');
+                alert('Introduza o seu nome.');
                 return;
             }
 
@@ -452,8 +469,8 @@
 
             const percentage = ((totalCorrect / questions.length) * 100).toFixed(0);
 
-            scoreText.textContent = `You scored ${percentage}%`;
-            timeText.textContent = `Total time: ${formatTime(totalTime)}`;
+            scoreText.textContent = `Resultado: ${percentage}%`;
+            timeText.textContent = `Duração: ${formatTime(totalTime)}`;
 
             submitToGoogleForm(totalCorrect, averageTime, totalTime);
         }
