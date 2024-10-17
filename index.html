@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tinterno Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Nunito Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200..1000&display=swap" rel="stylesheet">
+    <!-- Icon -->
+    <link rel="icon" type="image/png" href="https://logos-world.net/wp-content/uploads/2020/09/Tinder-Logo.png">
+    <!-- Styles -->
+    <style>
+        *, *:before, *:after {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+            background-color: #ffffff;
+            color: #424242;
+            height: 100%;
+            overflow-x: hidden; /* Allow vertical scrolling if needed */
+        }
+
+        /* Initial Screen */
+        #start-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative;
+            overflow-y: auto;
+            padding-bottom: 60px; /* To accommodate footer */
+        }
+
+        #start-screen img {
+            max-width: 200px;
+        }
+
+        #username {
+            margin-top: 20px;
+            font-size: 24px;
+            padding: 10px;
+            width: 80%;
+            max-width: 300px;
+            border: 2px solid #fe3c72;
+            border-radius: 5px;
+        }
+
+        #start-button {
+            margin-top: 20px;
+            font-size: 24px;
+            padding: 10px 20px;
+            background-color: #fe3c72;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Embedded Video */
+        #video-container {
+            margin-top: 20px;
+            width: 80%;
+            max-width: 560px;
+        }
+
+        #video-container iframe {
+            width: 100%;
+            height: 315px;
+            border: none;
+        }
+
+        /* Tinder Cards */
+        .tinder {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            position: relative;
+            opacity: 0;
+            transition: opacity 0.1s ease-in-out;
+        }
+
+        .loaded.tinder {
+            opacity: 1;
+        }
+
+        .tinder--status {
+            position: absolute;
+            top: 50%;
+            margin-top: -50px;
+            z-index: 2;
+            width: 100%;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .tinder--status i {
+            font-size: 100px;
+            opacity: 0;
+            transform: scale(0.3);
+            transition: all 0.2s ease-in-out;
+            position: absolute;
+            width: 100px;
+            margin-left: -50px;
+        }
+
+        .tinder_love .fa-heart {
+            opacity: 0.7;
+            transform: scale(1);
+            color: #fe3c72;
+        }
+
+        .tinder_nope .fa-remove {
+            opacity: 0.7;
+            transform: scale(1);
+            color: #424242;
+        }
+
+        .tinder--cards {
+            flex-grow: 1;
+            padding-top: 20px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Start cards at the top */
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .tinder--card {
+            display: inline-block;
+            width: 90vw;
+            max-width: 600px;
+            height: 80vh; /* Increased height */
+            background: #FFFFFF;
+            padding-bottom: 20px;
+            border-radius: 8px;
+            overflow-y: auto; /* Allow scrolling if content is too long */
+            position: absolute;
+            will-change: transform;
+            transition: all 0.3s ease-in-out;
+            cursor: -webkit-grab;
+            cursor: -moz-grab;
+            cursor: grab;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .moving.tinder--card {
+            transition: none;
+            cursor: -webkit-grabbing;
+            cursor: -moz-grabbing;
+            cursor: grabbing;
+        }
+
+        .tinder--card img {
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .tinder--card h3 {
+            margin-top: 16px;
+            font-size: 24px;
+            padding: 0 16px;
+            pointer-events: none;
+        }
+
+        .tinder--card p {
+            margin-top: 8px;
+            font-size: 18px;
+            padding: 0 16px;
+            pointer-events: none;
+        }
+
+        /* Result Screen */
+        #result-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            position: relative;
+            padding-bottom: 60px; /* To accommodate footer */
+        }
+
+        #result-screen img {
+            max-width: 200px;
+        }
+
+        #result-screen h1 {
+            margin-top: 20px;
+            font-size: 48px;
+            color: #fe3c72;
+        }
+
+        #result-screen p {
+            margin-top: 10px;
+            font-size: 24px;
+            color: #424242;
+        }
+
+        #refresh-button {
+            margin-top: 20px;
+            font-size: 24px;
+            padding: 10px 20px;
+            background-color: #fe3c72;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Footer */
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 16px;
+            color: #424242;
+            background-color: #ffffff;
+            padding: 10px 0;
+        }
+
+        footer a {
+            color: #fe3c72;
+            text-decoration: none;
+        }
+    </style>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Hammer.js for touch gestures -->
+    <script src="https://hammerjs.github.io/dist/hammer.min.js"></script>
+</head>
+<body>
+    <!-- Initial Screen -->
+    <div id="start-screen">
+        <img src="https://logos-world.net/wp-content/uploads/2020/09/Tinder-Logo.png" alt="Logo">
+        <input type="text" id="username" placeholder="Username">
+        <button id="start-button">Começar</button>
+        <!-- Embedded YouTube Video -->
+        <div id="video-container">
+            <iframe src="https://www.youtube.com/embed/cUf2mJWYAck?si=OXOpt2ycs6j7Ewlz" title="YouTube video player" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <!-- Tinder Cards -->
+    <div class="tinder">
+        <div class="tinder--status">
+            <i class="fa fa-remove"></i>
+            <i class="fa fa-heart"></i>
+        </div>
+        <div class="tinder--cards" id="tinder-cards">
+            <!-- Cards will be injected here -->
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen">
+        <img src="https://logos-world.net/wp-content/uploads/2020/09/Tinder-Logo.png" alt="Logo">
+        <h1 id="score-text"></h1>
+        <p id="time-text"></p>
+        <button id="refresh-button">Refresh</button>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        © 2024 By <a href="https://www.linkedin.com/in/andrefrsilva/" target="_blank">André</a>, with ❤️
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Questions Data
+        const questions = [
+            { number: 1, image_url: 'https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg', title: 'Miguel Fernandes', text: 'Um familiar de um internado voluntariamente num hospital psiquiátrico quer requerer o internamento compulsivo por acreditar que o internado está a enganar os médicos e a esconder o seu estado mental. O internado é maior de idade e o familiar não tem procuração nem outras responsabilidades legais sobre ele.', answer: 'T' },
+            { number: 2, image_url: 'https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://fdczvxmwwjwpwbeeqcth.supabase.co/storage/v1/object/public/images/50dab922-5d48-4c6b-8725-7fd0755d9334/3a3f2d35-8167-4708-9ef0-bdaa980989f9.png', title: 'Patrícia Pinheiro', text: 'Dois psiquiatras avaliam um homem que afirma ser "a reencarnação de Eusébio" e então anda a dar pontapés em objetos que encontra nas ruas e acreditam que ele deve ser internado. Um dos psiquiatras é fervoroso adepto do Sporting e insiste que o homem está apenas "a expressar a sua frustração" de forma benigna, enquanto o outro, do Benfica, acha que é uma questão de honra protegê-lo.', answer: 'F' },
+            // Add more questions as needed
+        ];
+
+        let currentCardIndex = 0;
+        let results = [];
+        let startTime, questionStartTime;
+        let userName = '';
+        const userId = Math.random().toString(36).substring(2, 11);
+
+        const startScreen = document.getElementById('start-screen');
+        const tinderContainer = document.querySelector('.tinder');
+        const tinderCardsContainer = document.getElementById('tinder-cards');
+        const resultScreen = document.getElementById('result-screen');
+        const scoreText = document.getElementById('score-text');
+        const timeText = document.getElementById('time-text');
+
+        const startButton = document.getElementById('start-button');
+        const refreshButton = document.getElementById('refresh-button');
+        startButton.addEventListener('click', startQuiz);
+        refreshButton.addEventListener('click', () => location.reload());
+
+        function startQuiz() {
+            userName = document.getElementById('username').value.trim();
+            if (userName === '') {
+                alert('Please enter your username.');
+                return;
+            }
+
+            startScreen.style.display = 'none';
+            tinderContainer.style.display = 'flex';
+            enterFullscreen();
+
+            startTime = new Date();
+            questionStartTime = new Date();
+            loadCards();
+            initCards();
+        }
+
+        function enterFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
+        }
+
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { /* Safari */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE11 */
+                document.msExitFullscreen();
+            }
+        }
+
+        function loadCards() {
+            questions.forEach(question => {
+                const card = document.createElement('div');
+                card.classList.add('tinder--card');
+                card.innerHTML = `
+                    <img src="${question.image_url}" alt="Image">
+                    <h3>${question.title}</h3>
+                    <p>${question.text}</p>
+                `;
+                tinderCardsContainer.appendChild(card);
+            });
+        }
+
+        function initCards() {
+            const allCards = document.querySelectorAll('.tinder--card');
+            const newCards = document.querySelectorAll('.tinder--card:not(.removed)');
+
+            newCards.forEach(function (card, index) {
+                card.style.zIndex = allCards.length - index;
+                card.style.transform = 'scale(' + (20 - index) / 20 + ') translateY(-' + 30 * index + 'px)';
+                card.style.opacity = (10 - index) / 10;
+            });
+
+            tinderContainer.classList.add('loaded');
+
+            if (newCards.length === 0) {
+                endQuiz();
+            } else {
+                createHammer(newCards[0]);
+                questionStartTime = new Date();
+            }
+        }
+
+        function createHammer(card) {
+            const hammertime = new Hammer(card);
+
+            hammertime.on('pan', function (event) {
+                card.classList.add('moving');
+            });
+
+            hammertime.on('pan', function (event) {
+                if (event.deltaX === 0) return;
+                if (event.center.x === 0 && event.center.y === 0) return;
+
+                tinderContainer.classList.toggle('tinder_love', event.deltaX > 0);
+                tinderContainer.classList.toggle('tinder_nope', event.deltaX < 0);
+
+                const xMulti = event.deltaX * 0.03;
+                const yMulti = event.deltaY / 80;
+                const rotate = xMulti * yMulti;
+
+                event.target.style.transform = 'translate(' + event.deltaX + 'px, ' + event.deltaY + 'px) rotate(' + rotate + 'deg)';
+            });
+
+            hammertime.on('panend', function (event) {
+                card.classList.remove('moving');
+                tinderContainer.classList.remove('tinder_love');
+                tinderContainer.classList.remove('tinder_nope');
+
+                const moveOutWidth = document.body.clientWidth;
+                const keep = Math.abs(event.deltaX) < 80 || Math.abs(event.velocityX) < 0.5;
+
+                if (!keep) {
+                    const endX = Math.max(Math.abs(event.velocityX) * moveOutWidth, moveOutWidth);
+                    const toX = event.deltaX > 0 ? endX : -endX;
+                    const endY = Math.abs(event.velocityY) * moveOutWidth;
+                    const toY = event.deltaY > 0 ? endY : -endY;
+                    const xMulti = event.deltaX * 0.03;
+                    const yMulti = event.deltaY / 80;
+                    const rotate = xMulti * yMulti;
+
+                    card.style.transform = 'translate(' + toX + 'px, ' + (toY + event.deltaY) + 'px) rotate(' + rotate + 'deg)';
+                    card.classList.add('removed');
+
+                    handleAnswer(event.deltaX > 0 ? 'T' : 'F');
+                    initCards();
+                } else {
+                    card.style.transform = '';
+                }
+            });
+        }
+
+        function handleAnswer(userAnswer) {
+            const question = questions[currentCardIndex];
+            const isCorrect = userAnswer === question.answer ? 1 : 0;
+            const questionEndTime = new Date();
+            const duration = (questionEndTime - questionStartTime) / 1000;
+
+            results.push({
+                number: question.number,
+                correct: isCorrect,
+                duration: duration.toFixed(2)
+            });
+
+            currentCardIndex++;
+        }
+
+        function endQuiz() {
+            exitFullscreen();
+            tinderContainer.style.display = 'none';
+            resultScreen.style.display = 'flex';
+
+            const totalCorrect = results.reduce((sum, result) => sum + result.correct, 0);
+            const totalTime = (new Date() - startTime) / 1000;
+            const averageTime = totalTime / results.length;
+
+            const percentage = ((totalCorrect / questions.length) * 100).toFixed(0);
+
+            scoreText.textContent = `You scored ${percentage}%`;
+            timeText.textContent = `Total time: ${formatTime(totalTime)}`;
+
+            submitToGoogleForm(totalCorrect, averageTime, totalTime);
+        }
+
+        function formatTime(totalSeconds) {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = Math.floor(totalSeconds % 60);
+
+            return `${hours > 0 ? hours + 'h ' : ''}${minutes > 0 ? minutes + 'm ' : ''}${seconds}s`;
+        }
+
+        function submitToGoogleForm(totalCorrect, averageTime, totalTime) {
+            const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdQdiiIjDrA6UcrvU_33RuJ47mtJf7Sf-MXKbPxX0_icHP9pg/formResponse';
+
+            const formData = new URLSearchParams();
+
+            formData.append('entry.46037875', 'voxpop'); // tipo
+            formData.append('entry.620583228', userId); // id_tentativa
+            formData.append('entry.804526002', userName); // nome
+            formData.append('entry.228812446', ''); // contacto
+
+            results.forEach((result, index) => {
+                const questionNumber = index + 1;
+                formData.append(`entry.${getEntryId(questionNumber)}`, result.correct);
+                formData.append(`entry.${getDurationEntryId(questionNumber)}`, result.duration);
+            });
+
+            formData.append('entry.1567753743', totalCorrect); // P_total_correct
+            formData.append('entry.2009592622', averageTime.toFixed(2)); // P_average_duration
+            formData.append('entry.46994002', totalTime.toFixed(2)); // P_total_duration
+
+            fetch(formUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            })
+            .then(() => {
+                console.log('Form submitted successfully.');
+            })
+            .catch((error) => {
+                console.error('Error submitting form:', error);
+            });
+        }
+
+        function getEntryId(questionNumber) {
+            const ids = {
+                1: '1536117895',
+                2: '180679466',
+                3: '1580488437',
+                4: '1777612300',
+                5: '348724122',
+                6: '1728556021',
+                7: '2007403367',
+                8: '1225240906',
+                9: '344671734',
+                10: '1336642552'
+            };
+            return ids[questionNumber];
+        }
+
+        function getDurationEntryId(questionNumber) {
+            const ids = {
+                1: '1413943462',
+                2: '1155241086',
+                3: '21236591',
+                4: '2028532314',
+                5: '1388867549',
+                6: '1267353413',
+                7: '1781872233',
+                8: '2087669251',
+                9: '211771024',
+                10: '1499496545'
+            };
+            return ids[questionNumber];
+        }
+    </script>
+</body>
+</html>
